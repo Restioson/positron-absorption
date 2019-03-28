@@ -1,2 +1,2 @@
 # positron-absorption
-A model for positron absorption in a given medium
+A model for positron absorption by annihilation in a given medium
