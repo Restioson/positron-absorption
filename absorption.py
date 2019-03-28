@@ -1,8 +1,10 @@
 import operator
 import functools
 import mpmath
+import halleys_method
 
 ELECTRON_MASS = 0.511  # MeV/c^2
+
 
 # https://stackoverflow.com/a/7948307
 def prod(iterable):
@@ -34,22 +36,26 @@ def product_particle_retention_terms(
 def exponential_integral_inverse(x):
     raise RuntimeError("todo")  # TODO fill in
 
+
 def particles_after_annihilation(
         initial_particles,
         distance,
+        width,
         electron_charge,
         positron_charge,
         vacuum_permativity,
         electron_number_density,
         ionisation_potential,
+        initial_energy,
 ):
     terms = product_particle_retention_terms(
-        distance,
+        distance / width,
         electron_charge,
         positron_charge,
         vacuum_permativity,
         electron_number_density,
         ionisation_potential,
+        initial_energy,
     )
 
     return initial_particles * prod(terms)
