@@ -30,8 +30,10 @@ def product_particle_retention_terms(
         denominator = mpmath.e ** (exp_integral_inv / 2)
         energy_proportionality_correction = mpmath.sqrt(ELECTRON_MASS / (2 * (electron_number_density**2)))
 
-        yield (1 - (energy_proportionality_correction * mpmath.sqrt(b / denominator)))
-
+        yield (1 - (mpmath.sqrt(b / denominator))/energy_proportionality_correction)
+'''
+        print((mpmath.sqrt(b / denominator))/energy_proportionality_correction)
+'''
 
 def exponential_integral_inverse(p):
     initial = None
@@ -78,7 +80,7 @@ print("Particles after annihilation, distance = 0:")
 print(particles_after_annihilation(
     initial_particles=1,
     distance=0,
-    width=mpmath.mpf('1e-21'),
+    width=mpmath.mpf('1e-0'),
     electron_charge=mpmath.mpf('-1.602176634e-19'),
     positron_charge=mpmath.mpf('+1.602176634e-19'),
     vacuum_permativity=mpmath.mpf("8.85e-12"),
