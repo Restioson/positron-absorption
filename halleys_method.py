@@ -40,5 +40,5 @@ def solve_fx(initial, p):
         x = xnew
 
 
-mpmath.mp.dps = 200
+mpmath.mp.dps = 100
 
