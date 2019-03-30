@@ -34,7 +34,20 @@ def product_particle_retention_terms(
 
 
 def exponential_integral_inverse(p):
-    raise RuntimeError("todo")# TODO fill in
+    initial = None
+
+    if p > 3.5:
+        initial = p * mpmath.ln(p)
+    elif 0.75 < p <= 3.5:
+        initial = p + 1
+    elif -0.5 < p <= 0.75:
+        initial = 1.45137 + (p * 0.37251)
+    elif -43.8 < p <= -0.5:
+        initial = 1 + mpmath.e**(p + mpmath.euler)
+    else:
+        return 1
+
+    return mpmath.ln(halleys_method.solve_fx(initial, p))
 
 
 def particles_after_annihilation(

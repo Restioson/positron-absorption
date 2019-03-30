@@ -10,30 +10,29 @@ import math
 
 h = mpmath.mpf(0.00_000_001)
 eps = mpmath.mpf(10**(-100_000_000_000_000_000_000))
-p = mpmath.mpf(100)
 
 
 # f(x) to solve
-def f(x):
+def f(x, p):
     return mpmath.li(x) - p
 
 
 # general numerical derivative function
-def fp(x, k):
+def fp(x, k, p):
     global h
     if k == 0:
-        return f(x)
+        return f(x, p)
     else:
-        return (fp(x + h, k - 1) - fp(x, k - 1)) / h
+        return (fp(x + h, k - 1, p) - fp(x, k - 1, p)) / h
 
 
 # main
-def solve_fx(initial):
+def solve_fx(initial, p):
     x = initial  # initial value
 
     while True:
-        fx = f(x)
-        fpx = fp(x, 1)
+        fx = f(x, p)
+        fpx = fp(x, 1, p)
         xnew = x - (mpmath.li(x) - p)*(math.log(x))/(1 + (mpmath.li(x) - p)/(2*x))
         if abs(xnew - x) <= eps:
             return xnew
@@ -43,5 +42,3 @@ def solve_fx(initial):
 
 mpmath.mp.dps = 500
 
-print(math.log(solve_fx(mpmath.mpf(p))))
-print(mpmath.ei(math.log(solve_fx(mpmath.mpf(p)))))
