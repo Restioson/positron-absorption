@@ -6,15 +6,15 @@
 # FB - 201011265
 
 import mpmath
-
+import math
 
 h = 0.00000001
-eps = 0.000001
-
+eps = 10**(-100000000000000000000)
+p = 100
 
 # f(x) to solve
 def f(x):
-    return x * x - 2.0
+    return mpmath.li(x) - p
 
 
 # general numerical derivative function
@@ -33,13 +33,23 @@ def solve_fx(initial):
     while True:
         fx = f(x)
         fpx = fp(x, 1)
+        '''
         xnew = x - (2.0 * fx * fpx) / (2.0 * fpx * fpx - fx * fp(x, 2))
-
+        '''
+        xnew = x - (mpmath.li(x) - p)*(math.log(x))/(1 + (mpmath.li(x) - p)/(2*x))
         if abs(xnew - x) <= eps:
             return xnew
 
         x = xnew
 
 
-mpmath.mp.dps = 200
-print(solve_fx(mpmath.mpf(2)))
+mpmath.mp.dps = 500
+
+print(math.log(solve_fx(mpmath.mpf(p))))
+
+print(mpmath.ei(math.log(solve_fx(mpmath.mpf(p)))))
+'''
+print(solve_fx(mpmath.mpf(p)))
+
+print(mpmath.li(solve_fx(mpmath.mpf(p))))
+'''

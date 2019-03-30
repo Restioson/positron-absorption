@@ -33,8 +33,8 @@ def product_particle_retention_terms(
         yield (1 - (energy_proportionality_correction * mpmath.sqrt(b / denominator)))
 
 
-def exponential_integral_inverse(x):
-    raise RuntimeError("todo")  # TODO fill in
+def exponential_integral_inverse(p):
+    raise RuntimeError("todo")# TODO fill in
 
 
 def particles_after_annihilation(
