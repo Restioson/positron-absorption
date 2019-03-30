@@ -26,9 +26,13 @@ def product_particle_retention_terms(
         b = 4 / ionisation_potential
 
         constant_of_integration = mpmath.ei(2 * mpmath.ln(b * initial_energy)) / (a * (b**2))
+        print(f"Constant of integration: {constant_of_integration}")
         exp_integral_inv = exponential_integral_inverse(a * (b**2) * (constant_of_integration - n))
+        print(f"Exponential integral inverse: {exp_integral_inv}")
         denominator = mpmath.e ** (exp_integral_inv / 2)
+        print(f"Denominator: {denominator}")
         energy_proportionality_correction = mpmath.sqrt(ELECTRON_MASS / (2 * (electron_number_density**2)))
+        print(f"Energy proportionality correction term: {energy_proportionality_correction}")
 
         yield (1 - (energy_proportionality_correction * mpmath.sqrt(b / denominator)))
 
