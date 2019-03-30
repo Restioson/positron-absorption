@@ -20,19 +20,20 @@ def product_particle_retention_terms(
         ionisation_potential,
         initial_energy,
 ):
+    print(f"Looping {distance + 1} times")
     for n in range(0, distance + 1):
         a = (electron_number_density * (positron_charge**2) * (electron_charge**4)) / \
             (8 * mpmath.pi * (vacuum_permativity**2))
         b = 4 / ionisation_potential
 
         constant_of_integration = mpmath.ei(2 * mpmath.ln(b * initial_energy)) / (a * (b**2))
-        print(f"Constant of integration: {constant_of_integration}")
+        # print(f"Constant of integration: {constant_of_integration}")
         exp_integral_inv = exponential_integral_inverse(a * (b**2) * (constant_of_integration - n))
-        print(f"Exponential integral inverse: {exp_integral_inv}")
+        # print(f"Exponential integral inverse: {exp_integral_inv}")
         denominator = mpmath.e ** (exp_integral_inv / 2)
-        print(f"Denominator: {denominator}")
+        # print(f"Denominator: {denominator}")
         energy_proportionality_correction = mpmath.sqrt(ELECTRON_MASS / (2 * (electron_number_density**2)))
-        print(f"Energy proportionality correction term: {energy_proportionality_correction}")
+        # print(f"Energy proportionality correction term: {energy_proportionality_correction}")
 
         yield (1 - (energy_proportionality_correction * mpmath.sqrt(b / denominator)))
 
@@ -81,8 +82,8 @@ def particles_after_annihilation(
 print("Particles after annihilation, distance = 0:")
 print(particles_after_annihilation(
     initial_particles=1,
-    distance=0,
-    width=mpmath.mpf('1e-21'),
+    distance=1,
+    width=mpmath.mpf('1e-3'),
     electron_charge=mpmath.mpf('-1.602176634e-19'),
     positron_charge=mpmath.mpf('+1.602176634e-19'),
     vacuum_permativity=mpmath.mpf("8.85e-12"),
