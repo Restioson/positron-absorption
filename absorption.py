@@ -62,13 +62,27 @@ def particles_after_annihilation(
         initial_energy,
 ):
     terms = product_particle_retention_terms(
-        distance / width,
-        electron_charge,
-        positron_charge,
-        vacuum_permativity,
-        electron_number_density,
-        ionisation_potential,
-        initial_energy,
+        distance,
+        mpmath.mpf(electron_charge),
+        mpmath.mpf(positron_charge),
+        mpmath.mpf(vacuum_permativity),
+        mpmath.mpf(electron_number_density),
+        mpmath.mpf(ionisation_potential),
+        mpmath.mpf(initial_energy),
     )
 
-    return initial_particles * prod(terms)
+    return mpmath.mpf(initial_particles) * prod(terms)
+
+
+print("Particles after annihilation, distance = 0:")
+print(particles_after_annihilation(
+    initial_particles=1,
+    distance=0,
+    width=mpmath.mpf('1e-21'),
+    electron_charge=mpmath.mpf('-1.602176634e-19'),
+    positron_charge=mpmath.mpf('+1.602176634e-19'),
+    vacuum_permativity=mpmath.mpf("8.85e-12"),
+    electron_number_density=mpmath.mpf("3.333e-23"),
+    ionisation_potential=75,
+    initial_energy=4e6,
+))
