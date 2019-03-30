@@ -38,7 +38,3 @@ def solve_fx(initial, p):
             return xnew
 
         x = xnew
-
-
-mpmath.mp.dps = 100
-

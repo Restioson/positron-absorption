@@ -81,6 +81,8 @@ def particles_after_annihilation(
     return mpmath.mpf(initial_particles) * prod(terms)
 
 
+mpmath.mp.dps = 100
+
 print("Particles after annihilation, distance = 0:")
 print(particles_after_annihilation(
     initial_particles=1,
