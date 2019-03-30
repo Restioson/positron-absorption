@@ -62,7 +62,7 @@ def particles_after_annihilation(
         initial_energy,
 ):
     terms = product_particle_retention_terms(
-        distance,
+        round(distance / mpmath.mpf(width)),
         mpmath.mpf(electron_charge),
         mpmath.mpf(positron_charge),
         mpmath.mpf(vacuum_permativity),
