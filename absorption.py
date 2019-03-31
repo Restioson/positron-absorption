@@ -102,7 +102,7 @@ def particles_after_annihilation(
 
 
 def loop_inner(initial_particles, dist, prev_product):
-    width = mpmath.mpf('1e-20')
+    width = mpmath.mpf('1')
     electron_charge = mpmath.mpf('-1.602176634e-19')
     positron_charge = mpmath.mpf('+1.602176634e-19')
     vacuum_permativity = mpmath.mpf("8.85e-12")
@@ -127,15 +127,17 @@ def loop_inner(initial_particles, dist, prev_product):
 mpmath.mp.dps = 100
 previous_product = 1
 
+initial = 10**26
+
 with open('out.csv', 'w') as csvfile:
     writer = csv.writer(csvfile)
 
     for distance in range(0, 10**4 + 1):
         print(f"Particles after annihilation, distance = {distance}:")
 
-        particles_left, previous_product = loop_inner(1000, distance, previous_product)
+        particles_left, previous_product = loop_inner(initial, distance, previous_product)
 
         mpmath.mp.dps = 26
-        print(particles_left)
-        writer.writerow([distance, particles_left])
+        print(particles_left - initial)
+        writer.writerow([distance, particles_left -initial])
         mpmath.mp.dps = 100
