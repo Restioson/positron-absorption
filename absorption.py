@@ -130,14 +130,14 @@ previous_product = 1
 initial = 10**26
 
 with open('out.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile)
+    writer = csv.writer(csvfile, delimiter=';')
 
-    for distance in range(0, 10**4 + 1):
+    for distance in range(0, 10**3 + 1):
         print(f"Particles after annihilation, distance = {distance}:")
 
         particles_left, previous_product = loop_inner(initial, distance, previous_product)
 
         mpmath.mp.dps = 26
         print(particles_left - initial)
-        writer.writerow([distance, particles_left -initial])
+        writer.writerow([distance, particles_left - initial])
         mpmath.mp.dps = 100
