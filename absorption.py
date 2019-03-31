@@ -1,6 +1,7 @@
 import operator
 import functools
 import mpmath
+import csv
 import halleys_method
 
 ELECTRON_MASS = 0.511  # MeV/c^2
@@ -11,6 +12,28 @@ def prod(iterable):
     return functools.reduce(operator.mul, iterable, 1)
 
 
+def product_term(
+        n,
+        electron_charge,
+        positron_charge,
+        vacuum_permativity,
+        electron_number_density,
+        ionisation_potential,
+        initial_energy,
+):
+    a = (electron_number_density * (positron_charge ** 2) * (electron_charge ** 4)) / \
+        (8 * mpmath.pi * (vacuum_permativity ** 2))
+    b = 4 / ionisation_potential
+
+    constant_of_integration = mpmath.ei(2 * mpmath.ln(b * initial_energy)) / (a * (b ** 2))
+    exp_integral_inv = exponential_integral_inverse(a * (b ** 2) * (constant_of_integration - n))
+    denominator = mpmath.e ** (exp_integral_inv / 2)
+    energy_proportionality_correction = mpmath.sqrt(ELECTRON_MASS / (2 * (electron_number_density ** 2)))
+
+    return 1 - (mpmath.sqrt(b / denominator)) / energy_proportionality_correction
+
+
+# Calculate the terms from scratch
 def product_particle_retention_terms(
         distance,
         electron_charge,
@@ -22,23 +45,16 @@ def product_particle_retention_terms(
 ):
     print(f"Looping {distance + 1} times")
     for n in range(0, distance + 1):
-        a = (electron_number_density * (positron_charge**2) * (electron_charge**4)) / \
-            (8 * mpmath.pi * (vacuum_permativity**2))
-        b = 4 / ionisation_potential
+        yield product_term(
+            n,
+            electron_charge,
+            positron_charge,
+            vacuum_permativity,
+            electron_number_density,
+            ionisation_potential,
+            initial_energy
+        )
 
-        constant_of_integration = mpmath.ei(2 * mpmath.ln(b * initial_energy)) / (a * (b**2))
-        # print(f"Constant of integration: {constant_of_integration}")
-        exp_integral_inv = exponential_integral_inverse(a * (b**2) * (constant_of_integration - n))
-        # print(f"Exponential integral inverse: {exp_integral_inv}")
-        denominator = mpmath.e ** (exp_integral_inv / 2)
-        # print(f"Denominator: {denominator}")
-        energy_proportionality_correction = mpmath.sqrt(ELECTRON_MASS / (2 * (electron_number_density**2)))
-        # print(f"Energy proportionality correction term: {energy_proportionality_correction}")
-
-        yield (1 - (mpmath.sqrt(b / denominator))/energy_proportionality_correction)
-'''
-        print((mpmath.sqrt(b / denominator))/energy_proportionality_correction)
-'''
 
 def exponential_integral_inverse(p):
     initial = None
@@ -57,9 +73,10 @@ def exponential_integral_inverse(p):
     return mpmath.ln(halleys_method.solve_fx(initial, p))
 
 
+# Returns the particles after annihilation from scratch
 def particles_after_annihilation(
         initial_particles,
-        distance,
+        dist,
         width,
         electron_charge,
         positron_charge,
@@ -69,7 +86,7 @@ def particles_after_annihilation(
         initial_energy,
 ):
     terms = product_particle_retention_terms(
-        round(distance / mpmath.mpf(width)),
+        round(dist / mpmath.mpf(width)),
         mpmath.mpf(electron_charge),
         mpmath.mpf(positron_charge),
         mpmath.mpf(vacuum_permativity),
@@ -78,20 +95,47 @@ def particles_after_annihilation(
         mpmath.mpf(initial_energy),
     )
 
-    return mpmath.mpf(initial_particles) * prod(terms)
+    term_prod = prod(terms)
+    print(f"Term prod: {term_prod}")
+
+    return mpmath.mpf(initial_particles) * term_prod
+
+
+def loop_inner(initial_particles, dist, prev_product):
+    width = mpmath.mpf('1e-20')
+    electron_charge = mpmath.mpf('-1.602176634e-19')
+    positron_charge = mpmath.mpf('+1.602176634e-19')
+    vacuum_permativity = mpmath.mpf("8.85e-12")
+    electron_number_density = mpmath.mpf("3.333e-23")
+    ionisation_potential = 75
+    initial_energy = 4e6
+
+    term = product_term(
+        round(dist / mpmath.mpf(width)),
+        mpmath.mpf(electron_charge),
+        mpmath.mpf(positron_charge),
+        mpmath.mpf(vacuum_permativity),
+        mpmath.mpf(electron_number_density),
+        mpmath.mpf(ionisation_potential),
+        mpmath.mpf(initial_energy),
+    )
+
+    product = term * prev_product
+    return mpmath.mpf(initial_particles) * product, product
 
 
 mpmath.mp.dps = 100
+previous_product = 1
 
-print("Particles after annihilation, distance = 0:")
-print(particles_after_annihilation(
-    initial_particles=1,
-    distance=0,
-    width=mpmath.mpf('1e-0'),
-    electron_charge=mpmath.mpf('-1.602176634e-19'),
-    positron_charge=mpmath.mpf('+1.602176634e-19'),
-    vacuum_permativity=mpmath.mpf("8.85e-12"),
-    electron_number_density=mpmath.mpf("3.333e-23"),
-    ionisation_potential=75,
-    initial_energy=4e6,
-))
+with open('out.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile)
+
+    for distance in range(0, 10**4 + 1):
+        print(f"Particles after annihilation, distance = {distance}:")
+
+        particles_left, previous_product = loop_inner(1000, distance, previous_product)
+
+        mpmath.mp.dps = 26
+        print(particles_left)
+        writer.writerow([distance, particles_left])
+        mpmath.mp.dps = 100
